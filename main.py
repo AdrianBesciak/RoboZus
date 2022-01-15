@@ -43,4 +43,4 @@ def wall_follower_main():
 
 
 if __name__ == '__main__':
-    main()
+    wall_follower_main()
