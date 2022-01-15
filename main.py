@@ -1,4 +1,6 @@
 import time
+from arduino import Arduino
+from motor_driver import MotorDriver
 
 import speech_recognition as sr
 
@@ -28,6 +30,16 @@ def main():
 
     # start listening in the background (note that we don't have to do this inside a `with` statement)
     stop_listening = r.listen_in_background(m, callback,phrase_time_limit=10)
+
+
+def wall_follower_main():
+    left_motor = MotorDriver(13, 5, 6)
+    right_motor = MotorDriver(12, 20, 16)
+
+    arduino = Arduino('ttyUSB0')
+
+    left_motor.spin(100)
+    right_motor.spin(100)
 
 
 if __name__ == '__main__':
