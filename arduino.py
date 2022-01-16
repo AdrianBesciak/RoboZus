@@ -1,7 +1,7 @@
 import serial
 from time import sleep
 
-dist_keys = ['right', 'front', 'left', 'back']
+dist_keys = ['left', 'front', 'right', 'back']
 
 
 class Arduino:
@@ -23,12 +23,14 @@ class Arduino:
         self.serial.close()
 
     def send(self, command):
+        print(str.encode(command.__str__()))
         self.serial.write(str.encode(command.__str__()))
 
     def read(self):
         data = ''
         while data == '':
             data = self.serial.read_until('\n').decode("utf-8")
+            print('dupa1_2', len(data))
         return data
 
     def get_distances(self):
@@ -45,3 +47,11 @@ class Arduino:
     def get_brightness_value(self):
         self.send('B')
         return self.read()
+
+if __name__ == '__main__':
+    arduino = Arduino('ttyUSB0')
+    print('connected')
+    print('dupa1')
+    sleep(0.5)
+    distances = arduino.get_distances()
+    print('DUPAAAAA')

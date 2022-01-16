@@ -37,15 +37,20 @@ def main():
 
 
 def wall_follower_main():
+    arduino = Arduino('ttyUSB0')
+    print(arduino.get_distances())
+
     kit = MotorKit(i2c=board.I2C())
 
-    motor_left = kit.motor1.throttle
-    motor_right = kit.motor2.throttle
+    motor_left = kit.motor2
+    motor_right = kit.motor1
+
+    s0 = 0.0
+    s1 = 0.05
+    s2 = 0.07
 
     time.sleep(0.5)
     kit.motor1.throttle = 0
-
-    arduino = Arduino('ttyUSB0')
 
     right_measurement = 500
     front_measurement = 10000
@@ -58,15 +63,23 @@ def wall_follower_main():
             elif key == 'right':
                 right_measurement = val
 
-        if front_measurement < 400:
-            motor_left.throttle = 0.5
-            motor_right.throttle = -0.5
-        elif right_measurement < 250:
-            motor_right.throttle = 1.0
-            motor_left.throttle = 0.75
+        if front_measurement < 3000:
+            motor_left.throttle = s1
+            motor_right.throttle = s0
+        elif right_measurement < 1500:
+            motor_right.throttle = s2
+            motor_left.throttle = s1
         else:
-            motor_right.throttle = 0.75
-            motor_left.throttle = 1.0
+            motor_right.throttle = s1
+            motor_left.throttle = s2
+
+
+def stop_motors():
+    kit = MotorKit(i2c=board.I2C())
+    motor_left = kit.motor1
+    motor_right = kit.motor2
+    motor_left.throttle = 0.0
+    motor_right.throttle = 0.0
 
 
 if __name__ == '__main__':
