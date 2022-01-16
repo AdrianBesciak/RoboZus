@@ -1,8 +1,12 @@
 import time
-from arduino import Arduino
-from motor_driver import MotorDriver
+from arduino import *
+import time
+import board
+from adafruit_motorkit import MotorKit
 
 import speech_recognition as sr
+
+
 
 # this is called from the background thread
 def callback(recognizer, audio):
@@ -33,13 +37,36 @@ def main():
 
 
 def wall_follower_main():
-    left_motor = MotorDriver(13, 5, 6)
-    right_motor = MotorDriver(12, 20, 16)
+    kit = MotorKit(i2c=board.I2C())
+
+    motor_left = kit.motor1.throttle
+    motor_right = kit.motor2.throttle
+
+    time.sleep(0.5)
+    kit.motor1.throttle = 0
 
     arduino = Arduino('ttyUSB0')
 
-    left_motor.spin(100)
-    right_motor.spin(100)
+    right_measurement = 500
+    front_measurement = 10000
+
+    while True:
+        distances = arduino.get_distances()
+        for key, val in distances.items():
+            if key == 'front':
+                front_measurement = val
+            elif key == 'right':
+                right_measurement = val
+
+        if front_measurement < 400:
+            motor_left.throttle = 0.5
+            motor_right.throttle = -0.5
+        elif right_measurement < 250:
+            motor_right.throttle = 1.0
+            motor_left.throttle = 0.75
+        else:
+            motor_right.throttle = 0.75
+            motor_left.throttle = 1.0
 
 
 if __name__ == '__main__':
